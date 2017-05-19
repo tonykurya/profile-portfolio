@@ -1,26 +1,47 @@
 ---
 layout: post
-title: Welcome to jekyll!
-subtitle: Jekyll is a blog-aware, static site generator in Ruby https://jekyllrb.com
-date: 2016-05-20 21:11:27
-author: jekyll
+title: Techthorpe Mini 03 - Purging your Cloudflare cache
+subtitle: Cloudflare CDN
+link: https://techthorpe.in/articles/2017-05/techthorpe-mini-3
+date: 2017-05-13 21:11:27
+author: Tony Kurya
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+Do you use Cloudflare as your CDN? Then you must know that Cloudflare caches your website's static content and you need to purge your cache if you change any of your webpages or if you upload a new page. Let's automate it!
 
-To add new posts, simply add a file in the `_posts` directory that follows the convention `YYYY-MM-DD-name-of-post.ext` and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+If you are to use the Cloudflare site to cleanup the cache, you would browse to the Cloudflare site, login with your credentials, click on the cache page, select one of the purge cache options and then your cache is cleared and Cloudflare loads it again…(Sigh!)
+
+I’ve found this XKCD Comic so true when automating things. In this Mini, we won’t be doing any complex automation. Don’t worry :D
+
+So, the first thing I did after setting up my cloudflare website was to write a script to purge the cache programmatically. It’s one of THE most used options and frankly it the only functionality I use regularly on Cloudflare. In this Techthorpe Mini, we will look at how to purge our Cloudflare cache using Python3.
 
 Jekyll also offers powerful support for code snippets:
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
+{% highlight python %}
+import requests
+
+headers = {
+    'X-Auth-Email': 'email@example.com',
+    'X-Auth-Key': 'your-api-key',
+    'Content-Type': 'application/json',
+}
+
+data = '{"purge_everything":true}'
+
+response = requests.delete('https://api.cloudflare.com/client/v4/zones/zone-identifier' +
+                '/purge_cache', headers=headers, data=data)
+print(response)
+
 {% endhighlight %}
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+This is a super simple script. But before you can use it you need to do two things.
 
-[jekyll-docs]: http://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+	1. Get your API Key from Cloudflare.
+	2. Get the Zone ID of your site.
+
+On your account page, under the overview section under domain summary you will see your Zone ID. Below the Zone ID, there will be a link ‘Get your API Key’ which on clicking will take you to your Subscriptions page. Under the API Key section on the page, click on View API Key next to the Global API Key option and note it down. Do not share the API key to anyone under any circumstances.
+
+In the above script, fill in your actual email, API key and Zone ID. When you execute this script you will get a Response 200 which means your purge request was successful. If you get any other response code check your inputs and execute again. If the problem persists browse to Cloudflare account portal to see what’s wrong.
+
+Hope you found it useful!
+
+
