@@ -29,7 +29,7 @@ data = '{"purge_everything":true}'
 
 response = requests.delete('https://api.cloudflare.com/client/v4/zones/zone-identifier' +
                 '/purge_cache', headers=headers, data=data)
-print(response)
+print(response) 
 
 {% endhighlight %}
 
